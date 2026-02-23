@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 export default function Home() {
   return (
     <main>
@@ -18,9 +20,11 @@ export default function Home() {
             </p>
 
             <div className="flex justify-center gap-4">
-              <button className="btn btn-primary btn-lg">
-                Mulai Gratis
-              </button>
+              <Link href="/login">
+                <button className="btn btn-primary btn-lg">
+                  Mlebu Gratis
+                </button>
+              </Link>
               <button className="btn btn-outline btn-lg">
                 Pelajari
               </button>
