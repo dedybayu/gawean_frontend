@@ -1,15 +1,70 @@
-// import { useNavigate } from "react-router-dom";
+"use client"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function Home() {
-  //   const navigate = useNavigate();
+  const router = useRouter()
 
-  //   const handleSubmit = (e) => {
-  //     e.preventDefault(); // Mencegah reload
+  // ✅ Pastikan selalu string kosong (bukan undefined)
+  const [email, setEmail] = useState<string>("")
+  const [password, setPassword] = useState<string>("")
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string>("")
 
-  //     // nanti di sini bisa tambahkan API login ke backend Golang
+  // ✅ AUTO REDIRECT kalau sudah login
+  useEffect(() => {
+    const token = localStorage.getItem("token")
 
-  //     navigate("/dashboard");
-  //   };
+    //TODO: Cek token apakah aktif
+
+    if (token) {
+      router.replace("/dashboard")
+    }
+  }, [router])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setError("")
+
+    try {
+      const response = await fetch("http://localhost:8085/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      })
+
+      const data = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Login gagal")
+      }
+
+      if (!data?.token) {
+        throw new Error("Token tidak ditemukan")
+      }
+
+      // ✅ Simpan token
+      localStorage.setItem("token", data.token)
+      localStorage.setItem("user", JSON.stringify(data.user))
+
+      router.push("/dashboard")
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError("Terjadi kesalahan")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <main className="min-h-screen bg-base-200 flex items-center justify-center px-4 bg-gradient-to-br from-primary/20 to-secondary/20">
@@ -27,7 +82,7 @@ export default function Home() {
           </div>
 
           {/* FORM */}
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
 
             {/* Email */}
             <div className="form-control">
@@ -38,6 +93,9 @@ export default function Home() {
                 type="email"
                 placeholder="email@contoh.com"
                 className="input input-bordered w-full"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
 
@@ -50,6 +108,9 @@ export default function Home() {
                 type="password"
                 placeholder="••••••••"
                 className="input input-bordered w-full"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
               <label className="label">
                 <a href="#" className="label-text-alt link link-hover">
@@ -58,9 +119,20 @@ export default function Home() {
               </label>
             </div>
 
+            {/* Error Alert */}
+            {error && (
+              <div className="alert alert-error text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Button */}
-            <button type="submit" className="btn btn-primary w-full mt-4">
-              Masuk
+            <button
+              type="submit"
+              className="btn btn-primary w-full mt-4"
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Mlebu"}
             </button>
 
           </form>
