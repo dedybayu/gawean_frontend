@@ -56,6 +56,7 @@ export default function Home() {
 
       router.push("/dashboard")
     } catch (err: unknown) {
+      console.error("Login error:", err) // ✅ tampil di console
       if (err instanceof Error) {
         setError(err.message)
       } else {
