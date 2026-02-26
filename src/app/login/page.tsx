@@ -29,7 +29,7 @@ export default function Home() {
     setError("")
 
     try {
-      const response = await fetch("http://10.10.168.17:8085/auth/login", {
+      const response = await fetch("http://localhost:8085/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export default function Home() {
 
       router.push("/dashboard")
     } catch (err: unknown) {
-      console.error("Login error:", err) // ✅ tampil di console
+      // console.error("Login error:", err) // ✅ tampil di console
       if (err instanceof Error) {
         setError(err.message)
       } else {
