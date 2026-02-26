@@ -1,32 +1,16 @@
-"use client"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+export default async function Dashboard() {
+  const cookieStore = await cookies() // ⬅️ WAJIB await
 
-export default function Dashboard() {
-  const router = useRouter()
+  const userCookie = cookieStore.get("user")?.value
 
-  useEffect(() => {
-    const token = localStorage.getItem("token")
-    
-    //TODO: Cek token apakah masih aktif
-
-    // Kalau tidak ada token, lempar ke login
-    if (!token) {
-      router.push("/login")
-    }
-  }, [router])
-
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
-
-    router.push("/login")
+  if (!userCookie) {
+    redirect("/login")
   }
 
-  const user = typeof window !== "undefined"
-    ? JSON.parse(localStorage.getItem("user") || "{}")
-    : {}
+  const user = JSON.parse(decodeURIComponent(userCookie))
 
   return (
     <main className="min-h-screen bg-base-200 flex items-center justify-center px-4">
@@ -38,15 +22,17 @@ export default function Dashboard() {
           </h1>
 
           <p className="text-base-content/70">
-            Sugeng rawuh, <span className="font-semibold">{user?.nama || "User"}</span> 👋
+            Sugeng rawuh,{" "}
+            <span className="font-semibold">
+              {user?.nama || "User"}
+            </span> 👋
           </p>
 
-          <button
-            onClick={handleLogout}
-            className="btn btn-error w-full"
-          >
-            Logout
-          </button>
+          <form action="/api/logout" method="POST">
+            <button className="btn btn-error w-full">
+              Logout
+            </button>
+          </form>
 
         </div>
       </div>

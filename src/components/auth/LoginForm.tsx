@@ -1,62 +1,55 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react";
 
 export default function LoginForm() {
-    const router = useRouter()
+  const router = useRouter()
 
-    const [email, setEmail] = useState<string>("")
-    const [password, setPassword] = useState<string>("")
-    const [loading, setLoading] = useState<boolean>(false)
-    const [error, setError] = useState<string>("")
+  const [email, setEmail] = useState<string>("")
+  const [password, setPassword] = useState<string>("")
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string>("")
 
-    useEffect(() => {
-        if (error) {
-            const timer = setTimeout(() => {
-                setError("");
-            }, 5000); // 5000 ms = 5 detik
-            return () => clearTimeout(timer);
-        }
-    }, [error]);
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        setLoading(true)
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
         setError("")
-
-        try {
-            const response = await fetch("/api/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-            })
-
-            const data = await response.json().catch(() => null)
-
-            if (!response.ok) {
-                throw new Error(data?.message || "Login gagal")
-            }
-
-            if (!data?.token) {
-                throw new Error("Token tidak ditemukan")
-            }
-
-            localStorage.setItem("token", data.token)
-            localStorage.setItem("user", JSON.stringify(data.user))
-
-            router.push("/dashboard")
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(err.message)
-            } else {
-                setError("Terjadi kesalahan")
-            }
-        } finally {
-            setLoading(false)
-        }
+      }, 5000)
+      return () => clearTimeout(timer)
     }
+  }, [error])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setError("")
+
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Login gagal")
+      }
+
+      // tidak perlu simpan token
+      router.push("/dashboard")
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError("Terjadi kesalahan")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
     return (
         <div className="card w-full max-w-lg bg-base-100 shadow-xl">
