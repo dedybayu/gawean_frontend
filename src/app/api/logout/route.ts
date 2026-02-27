@@ -1,16 +1,16 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
-export async function POST(req: Request) {
-  const response = NextResponse.redirect(new URL("/", req.url))
+export async function POST(request: NextRequest) {
+  const origin = request.nextUrl.origin
 
-  // Hapus token (httpOnly)
+  const response = NextResponse.redirect(`${origin}/`)
+
   response.cookies.set("token", "", {
     httpOnly: true,
     expires: new Date(0),
     path: "/",
   })
 
-  // Hapus user
   response.cookies.set("user", "", {
     expires: new Date(0),
     path: "/",
