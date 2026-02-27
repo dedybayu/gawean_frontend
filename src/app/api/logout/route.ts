@@ -1,9 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 
-export async function POST(request: NextRequest) {
-  const origin = request.nextUrl.origin
-
-  const response = NextResponse.redirect(`${origin}/`)
+export async function POST() {
+  const response = NextResponse.json({ success: true })
 
   response.cookies.set("token", "", {
     httpOnly: true,
