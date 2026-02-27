@@ -17,7 +17,8 @@ export async function POST(req: Request) {
         // ✅ Simpan token (secure)
         res.cookies.set("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            // secure: process.env.NODE_ENV === "production",
+            secure: false,
             sameSite: "lax",
             path: "/",
             maxAge: 60 * 60 * 24,
@@ -29,7 +30,8 @@ export async function POST(req: Request) {
             encodeURIComponent(JSON.stringify(user)), // ⬅️ WAJIB encode
             {
                 httpOnly: false,
-                secure: process.env.NODE_ENV === "production",
+                // secure: process.env.NODE_ENV === "production",
+                secure: false,
                 sameSite: "lax",
                 path: "/",
                 maxAge: 60 * 60 * 24,
