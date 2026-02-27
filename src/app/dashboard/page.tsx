@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import LogoutButton from "./LogoutButton"
 
 type User = {
-  nama: string
+  name: string
 }
 
 export default async function Dashboard() {
@@ -26,7 +26,7 @@ export default async function Dashboard() {
           <p className="text-base-content/70">
             Sugeng rawuh,{" "}
             <span className="font-semibold">
-              {user.nama}
+              {user.name}
             </span> 👋
           </p>
 
