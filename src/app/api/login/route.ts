@@ -7,7 +7,10 @@ export async function POST(req: Request) {
         const body = await req.json()
         const response = await api.post("/auth/login", body)
 
-        const { token, user } = response.data
+        const { access_token, refresh_token, user } = response.data
+        // console.log("Token:", access_token) // Debugging
+        // console.log("Refresh Token:", refresh_token) // Debugging
+        // console.log("User:", user) // Debugging
 
         const res = NextResponse.json(
             { message: "Login berhasil" },
@@ -15,13 +18,20 @@ export async function POST(req: Request) {
         )
 
         // ✅ Simpan token (secure)
-        res.cookies.set("token", token, {
+        res.cookies.set("access_token", access_token, {
             httpOnly: true,
-            // secure: process.env.NODE_ENV === "production",
-            secure: false,
+            secure: false, // true kalau production
             sameSite: "lax",
             path: "/",
-            maxAge: 60 * 60 * 24,
+            maxAge: 60 * 15, // 15 menit
+        })
+
+        res.cookies.set("refresh_token", refresh_token, {
+            httpOnly: true,
+            secure: false, // true kalau production
+            sameSite: "lax",
+            path: "/",
+            maxAge: 60 * 60 * 24 * 7, // 7 hari
         })
 
         // ✅ Simpan user (bisa dibaca client)
@@ -39,6 +49,7 @@ export async function POST(req: Request) {
         )
 
         return res
+        
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
             return NextResponse.json(
